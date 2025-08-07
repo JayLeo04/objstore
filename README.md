@@ -771,3 +771,5 @@ Following checklist allows adding new Go code client to supported providers:
 7. Add client struct config to [cfggen](scripts/cfggen/main.go); to allow config auto generation.
 
 At that point, anyone can use your provider by spec.
+
+# for jk
