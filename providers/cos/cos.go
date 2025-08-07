@@ -192,8 +192,18 @@ func (b *Bucket) Attributes(ctx context.Context, name string) (objstore.ObjectAt
 
 // Upload the contents of the reader as an object into the bucket.
 func (b *Bucket) Upload(ctx context.Context, name string, r io.Reader) error {
+	// Read all data to get content length to avoid chunked encoding
+	// which is not supported by some COS endpoints
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return errors.Wrapf(err, "read data for upload: %s", name)
+	}
+
+	// Create a new reader from the data
+	reader := strings.NewReader(string(data))
+
 	// Upload the entire object directly without chunked/multipart upload
-	if _, err := b.client.Object.Put(ctx, name, r, nil); err != nil {
+	if _, err := b.client.Object.Put(ctx, name, reader, nil); err != nil {
 		return errors.Wrapf(err, "Put object: %s", name)
 	}
 	return nil
